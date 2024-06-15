@@ -1,5 +1,6 @@
 package com.example.primaryschoolquiz
 
+import android.widget.Toast
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -46,6 +47,10 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
+import androidx.compose.ui.platform.LocalContext
+import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.auth.FirebaseAuthInvalidCredentialsException
+import com.google.firebase.auth.FirebaseAuthInvalidUserException
 
 @Composable
 fun TeacherLoginScreen(navController: NavController? = null) {
@@ -56,6 +61,29 @@ fun TeacherLoginScreen(navController: NavController? = null) {
 
     val passwordState = remember {
         mutableStateOf(TextFieldValue(""))
+    }
+
+    val context = LocalContext.current
+
+    fun login(email: String, password: String) {
+        val auth = FirebaseAuth.getInstance()
+        auth.signInWithEmailAndPassword(email, password)
+            .addOnCompleteListener { task ->
+                if (task.isSuccessful) {
+                    navController?.navigate("teacher_menu")
+                } else {
+                    // Handle errors
+                    try {
+                        throw task.exception ?: Exception("Login failed")
+                    } catch (e: FirebaseAuthInvalidUserException) {
+                        Toast.makeText(context, "User not found. Please sign up first.", Toast.LENGTH_LONG).show()
+                    } catch (e: FirebaseAuthInvalidCredentialsException) {
+                        Toast.makeText(context, "Invalid password. Please try again.", Toast.LENGTH_LONG).show()
+                    } catch (e: Exception) {
+                        Toast.makeText(context, "Login failed: ${e.message}", Toast.LENGTH_LONG).show()
+                    }
+                }
+            }
     }
 
     Box(
@@ -98,7 +126,7 @@ fun TeacherLoginScreen(navController: NavController? = null) {
             Spacer(modifier = Modifier.height(32.dp))
             Column (
                 modifier = Modifier
-                    .offset(y = 90.dp)
+                    .offset(y = 20.dp)
                     .padding(horizontal = 32.dp)
                     .fillMaxWidth()
             ) {
@@ -152,7 +180,9 @@ fun TeacherLoginScreen(navController: NavController? = null) {
             }
         }
         Button(
-            onClick = { /*TODO*/ },
+            onClick = {
+                login(emailState.value.text, passwordState.value.text)
+            },
             modifier = Modifier
                 .align(Alignment.BottomCenter)
                 .padding(100.dp)

@@ -3,6 +3,7 @@ package com.example.primaryschoolquiz
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
+import com.google.firebase.FirebaseApp
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.Column
@@ -59,6 +60,7 @@ import androidx.navigation.compose.rememberNavController
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        FirebaseApp.initializeApp(this)
         setContent {
             PrimarySchoolQuizTheme {
                 AppQuiz()
@@ -77,7 +79,13 @@ class MainActivity : ComponentActivity() {
                 TeacherLoginScreen(navController)
             }
             composable("sign_up") {
-                SignUpScreen()
+                SignUpScreen(navController)
+            }
+            composable("teacher_profile") {
+                TeacherProfileScreen(navController)
+            }
+            composable("teacher_menu") {
+                TeacherMenuScreen(navController)
             }
         }
     }
@@ -126,7 +134,7 @@ class MainActivity : ComponentActivity() {
                     contentDescription = null,
                     modifier = Modifier
                         .size(55.dp)
-                        .offset(x = 12.dp)
+                        .offset(x = 15.dp)
                         .clip(CircleShape)
                         .clickable(
                             interactionSource = remember {
@@ -138,6 +146,7 @@ class MainActivity : ComponentActivity() {
                             }
                         )
                 )
+                Spacer(modifier = Modifier.height(3.dp))
                 Text(
                     text = "Teacher's Login",
                     style = TextStyle(
