@@ -82,14 +82,14 @@ fun TeacherMenuScreen(navController: NavController? = null) {
                             icon = Icons.Default.Create,
                             label = "Create Quiz",
                             onClick = {
-                                // Navigate to Create Quiz Screen
+                                navController?.navigate("create_quiz")
                             }
                         )
                         DrawerItem(
                             icon = Icons.Default.List,
                             label = "My Quizzes",
                             onClick = {
-                                // Navigate to My Quizzes Screen
+                                navController?.navigate("my_quizzes")
                             }
                         )
                         DrawerItem(

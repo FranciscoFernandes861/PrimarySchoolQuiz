@@ -40,12 +40,10 @@ import androidx.compose.material.ripple.rememberRipple
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.TextField
 import androidx.compose.material3.TextFieldDefaults
-import androidx.compose.material3.TextFieldDefaults.textFieldColors
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush
-import androidx.compose.ui.modifier.ModifierLocalMap
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
@@ -55,7 +53,8 @@ import androidx.navigation.NavController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
-
+import com.example.primaryschoolquiz.db.QuizViewModel
+import androidx.lifecycle.viewmodel.compose.viewModel
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -87,6 +86,14 @@ class MainActivity : ComponentActivity() {
             composable("teacher_menu") {
                 TeacherMenuScreen(navController)
             }
+            composable("create_quiz") {
+                val viewModel: QuizViewModel = viewModel()
+                CreateQuizScreen(viewModel, navController)
+            }
+            composable("my_quizzes") {
+                val viewModel: QuizViewModel = viewModel()
+                MyQuizzesScreen(viewModel)
+            }
         }
     }
 
@@ -115,14 +122,11 @@ class MainActivity : ComponentActivity() {
     @OptIn(ExperimentalMaterial3Api::class)
     @Composable
     fun ImageNameAndButton(modifier: Modifier = Modifier, navController: NavController? = null) {
-
-        val textState = remember{ mutableStateOf("") }
+        val textState = remember { mutableStateOf("") }
 
         Box(
-            modifier = modifier
-                .fillMaxSize()
-        ){
-
+            modifier = modifier.fillMaxSize()
+        ) {
             Column(
                 modifier = Modifier
                     .align(Alignment.TopStart)
@@ -137,9 +141,7 @@ class MainActivity : ComponentActivity() {
                         .offset(x = 15.dp)
                         .clip(CircleShape)
                         .clickable(
-                            interactionSource = remember {
-                                MutableInteractionSource()
-                            },
+                            interactionSource = remember { MutableInteractionSource() },
                             indication = rememberRipple(color = Color.White),
                             onClick = {
                                 navController?.navigate("teacher_login")
@@ -158,68 +160,26 @@ class MainActivity : ComponentActivity() {
             }
 
             Column(
-            modifier = modifier.fillMaxSize(), // ir buscar modifier
-            horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.Center
+                modifier = modifier.fillMaxSize(),
+                horizontalAlignment = Alignment.CenterHorizontally,
+                verticalArrangement = Arrangement.Center
             ) {
-            Image(
-                painter = painterResource(R.drawable.ic_primary_school_logo),
-                null,
-                modifier = Modifier
-                    .size(320.dp)
-                    .offset(y = (-70).dp) // Faz subir a imagem em relação ao centro
-
-            )
-            Spacer(modifier = Modifier.height(32.dp))
-            Text(
-                text = "What is your name?",
-                style = TextStyle(
-                    fontSize = 23.sp,
-                    fontWeight = FontWeight.Bold
-                ),
-                modifier = Modifier.padding(bottom = 8.dp)
-            )
-            TextField(
-                value = textState.value,
-                onValueChange = { newValue ->
-                    if (newValue.length <= 25) {
-                        textState.value = newValue
-                    }
-                },
-                label = { Text("Enter your name") },
-                colors = TextFieldDefaults.colors(
-                    focusedLabelColor = Color(0xFFC3C3C3),
-                    unfocusedLabelColor = Color.Black
-                ),
-                singleLine = true,
-                modifier = Modifier
-                    .offset(y = (20).dp) //Offset para subir textField
-                    .padding(horizontal = 20.dp)
-                    .border(BorderStroke(3.dp, Color(0xFF213056))),
-                keyboardOptions = KeyboardOptions.Default.copy(
-                    keyboardType = KeyboardType.Text,
-                    imeAction = androidx.compose.ui.text.input.ImeAction.Done
+                Image(
+                    painter = painterResource(R.drawable.ic_primary_school_logo),
+                    contentDescription = null,
+                    modifier = Modifier
+                        .size(320.dp)
+                        .offset(y = (-70).dp) // Faz subir a imagem em relação ao centro
                 )
-                )
-
-            }
-                Button(
-                onClick = { /*TODO*/ },
-                colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF213056)),
-                modifier = Modifier
-                    .size(width = 170.dp, height = 60.dp)
-                    .align(Alignment.BottomCenter)
-                    .offset(y = (-70).dp) // Offset para subir botão play
-            ) {
+                Spacer(modifier = Modifier.height(32.dp))
                 Text(
-                    text = stringResource(R.string.play),
+                    text = "What is your name?",
                     style = TextStyle(
-                        fontSize = 20.sp,
+                        fontSize = 23.sp,
                         fontWeight = FontWeight.Bold
                     )
-                    ) // botão play
-
+                )
+            }
         }
     }
-}
 }

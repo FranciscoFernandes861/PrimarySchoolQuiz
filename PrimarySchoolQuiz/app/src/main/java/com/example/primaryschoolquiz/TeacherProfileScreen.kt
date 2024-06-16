@@ -24,12 +24,16 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
+import androidx.navigation.compose.rememberNavController
 import com.google.firebase.auth.FirebaseAuth
 
+data class MockUser(
+    val email: String
+)
+
 @Composable
-fun TeacherProfileScreen(navController: NavController? = null) {
-    val user = FirebaseAuth.getInstance().currentUser
-    val email = remember { mutableStateOf(user?.email ?: "No Email") }
+fun TeacherProfileScreen(navController: NavController? = null, mockUser: MockUser? = null) {
+    val email = remember { mutableStateOf(mockUser?.email ?: "No Email") }
 
     fun logout() {
         FirebaseAuth.getInstance().signOut()
@@ -92,5 +96,7 @@ fun TeacherProfileScreen(navController: NavController? = null) {
 @Preview
 @Composable
 fun PreviewTeacherProfileScreen() {
-    TeacherProfileScreen()
+    val mockNavController = rememberNavController()
+    val mockUser = MockUser(email = "mockuser@example.com")
+    TeacherProfileScreen(navController = mockNavController, mockUser = mockUser)
 }
