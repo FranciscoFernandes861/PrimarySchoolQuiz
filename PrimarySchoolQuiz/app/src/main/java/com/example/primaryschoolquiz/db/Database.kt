@@ -7,7 +7,7 @@ import androidx.room.RoomDatabase
 import androidx.room.migration.Migration
 import androidx.sqlite.db.SupportSQLiteDatabase
 
-@Database(entities = [Quiz::class, Question::class], version = 2, exportSchema = false)
+@Database(entities = [Quiz::class, Question::class], version = 3, exportSchema = false)
 abstract class QuizDatabase : RoomDatabase() {
 
     abstract fun quizDao(): QuizDao
@@ -46,6 +46,22 @@ abstract class QuizDatabase : RoomDatabase() {
             }
         }
 
+        val MIGRATION_2_3 = object : Migration(2, 3) {
+            override fun migrate(database: SupportSQLiteDatabase) {
+                // Add userId column to quiz_table
+                database.execSQL("""
+                    CREATE TABLE IF NOT EXISTS `quiz_table_new` (
+                        `id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
+                        `name` TEXT NOT NULL,
+                        `userId` TEXT NOT NULL
+                    )
+                """)
+                database.execSQL("INSERT INTO `quiz_table_new` (`id`, `name`, `userId`) SELECT `id`, `name`, '' FROM `quiz_table`")
+                database.execSQL("DROP TABLE `quiz_table`")
+                database.execSQL("ALTER TABLE `quiz_table_new` RENAME TO `quiz_table`")
+            }
+        }
+
         fun getDatabase(context: Context): QuizDatabase {
             return INSTANCE ?: synchronized(this) {
                 val instance = Room.databaseBuilder(
@@ -53,7 +69,7 @@ abstract class QuizDatabase : RoomDatabase() {
                     QuizDatabase::class.java,
                     "quiz_database"
                 )
-                    .addMigrations(MIGRATION_1_2)
+                    .addMigrations(MIGRATION_1_2, MIGRATION_2_3)
                     .build()
                 INSTANCE = instance
                 instance

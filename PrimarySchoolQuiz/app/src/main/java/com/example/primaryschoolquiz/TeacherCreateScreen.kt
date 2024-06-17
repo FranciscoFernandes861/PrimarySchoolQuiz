@@ -10,6 +10,7 @@ import androidx.navigation.NavController
 import com.example.primaryschoolquiz.db.Quiz
 import com.example.primaryschoolquiz.db.Question
 import com.example.primaryschoolquiz.db.QuizViewModel
+import com.google.firebase.auth.FirebaseAuth
 
 @Composable
 fun CreateQuizScreen(viewModel: QuizViewModel, navController: NavController? = null) {
@@ -22,6 +23,8 @@ fun CreateQuizScreen(viewModel: QuizViewModel, navController: NavController? = n
     val option3State = remember { mutableStateOf("") }
     val option4State = remember { mutableStateOf("") }
     val correctOptionState = remember { mutableStateOf(1) }
+
+    val userId = FirebaseAuth.getInstance().currentUser?.uid ?: ""
 
     when (step) {
         1 -> {
@@ -38,7 +41,7 @@ fun CreateQuizScreen(viewModel: QuizViewModel, navController: NavController? = n
                 )
                 Spacer(modifier = Modifier.height(16.dp))
                 Button(onClick = {
-                    val quiz = Quiz(name = quizName)
+                    val quiz = Quiz(name = quizName, creatorId = userId)  // Set the userId here
                     viewModel.insertQuiz(quiz) { newQuizId ->
                         quizId = newQuizId
                         step = 2

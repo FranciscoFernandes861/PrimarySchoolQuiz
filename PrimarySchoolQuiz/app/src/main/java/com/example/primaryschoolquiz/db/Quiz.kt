@@ -10,7 +10,8 @@ import androidx.room.Embedded
 @Entity(tableName = "quiz_table")
 data class Quiz(
     @PrimaryKey(autoGenerate = true) val id: Int = 0,
-    val name: String
+    val name: String,
+    val creatorId: String
 )
 
 @Entity(

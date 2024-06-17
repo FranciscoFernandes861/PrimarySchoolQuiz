@@ -4,8 +4,9 @@ import androidx.lifecycle.LiveData
 
 class QuizRepository(private val quizDao: QuizDao) {
 
-    val allQuizzes: LiveData<List<QuizWithQuestions>> = quizDao.getAllQuizzes()
-
+    fun getAllQuizzes(userId: String): LiveData<List<QuizWithQuestions>> {
+        return quizDao.getAllQuizzes(userId)
+    }
     suspend fun insertQuiz(quiz: Quiz): Long {
         return quizDao.insertQuiz(quiz)
     }
