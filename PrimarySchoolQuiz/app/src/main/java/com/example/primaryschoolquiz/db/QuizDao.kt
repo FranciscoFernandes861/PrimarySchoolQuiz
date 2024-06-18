@@ -12,8 +12,6 @@ interface QuizDao {
     suspend fun insertQuestion(question: Question)
 
     @Transaction
-    @Query("SELECT * FROM quiz_table WHERE creatorId = :creatorId")
-    fun getAllQuizzes(creatorId: String): LiveData<List<QuizWithQuestions>>
-
-
+    @Query("SELECT * FROM quiz_table")
+    fun getAllQuizzes(): LiveData<List<QuizWithQuestions>>
 }

@@ -5,17 +5,16 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import com.example.primaryschoolquiz.db.Quiz
 import com.example.primaryschoolquiz.db.Question
 import com.example.primaryschoolquiz.db.QuizViewModel
-import com.google.firebase.auth.FirebaseAuth
 
 @Composable
 fun CreateQuizScreen(viewModel: QuizViewModel, navController: NavController? = null) {
     var step by remember { mutableStateOf(1) }
+    var quizId by remember { mutableStateOf<Long?>(null) }
     var quizName by remember { mutableStateOf("") }
     val questionState = remember { mutableStateOf("") }
     val option1State = remember { mutableStateOf("") }
@@ -23,9 +22,6 @@ fun CreateQuizScreen(viewModel: QuizViewModel, navController: NavController? = n
     val option3State = remember { mutableStateOf("") }
     val option4State = remember { mutableStateOf("") }
     val correctOptionState = remember { mutableStateOf(1) }
-    val questions = remember { mutableStateListOf<Question>() }
-    val userId = FirebaseAuth.getInstance().currentUser?.uid ?: ""
-    val context = LocalContext.current
 
     when (step) {
         1 -> {
@@ -41,7 +37,13 @@ fun CreateQuizScreen(viewModel: QuizViewModel, navController: NavController? = n
                     label = { Text("Quiz Name") }
                 )
                 Spacer(modifier = Modifier.height(16.dp))
-                Button(onClick = { step = 2 }) {
+                Button(onClick = {
+                    val quiz = Quiz(name = quizName)
+                    viewModel.insertQuiz(quiz) { newQuizId ->
+                        quizId = newQuizId
+                        step = 2
+                    }
+                }) {
                     Text("Next")
                 }
             }
@@ -82,7 +84,7 @@ fun CreateQuizScreen(viewModel: QuizViewModel, navController: NavController? = n
                 Spacer(modifier = Modifier.height(16.dp))
                 Button(onClick = {
                     val question = Question(
-                        quizId = "0",  // Placeholder, will be set correctly after quiz insertion
+                        quizId = quizId!!.toInt(),
                         question = questionState.value,
                         option1 = option1State.value,
                         option2 = option2State.value,
@@ -90,7 +92,7 @@ fun CreateQuizScreen(viewModel: QuizViewModel, navController: NavController? = n
                         option4 = option4State.value,
                         correctOption = correctOptionState.value
                     )
-                    questions.add(question)
+                    viewModel.insertQuestion(question)
                     questionState.value = ""
                     option1State.value = ""
                     option2State.value = ""
@@ -101,14 +103,7 @@ fun CreateQuizScreen(viewModel: QuizViewModel, navController: NavController? = n
                 }
                 Spacer(modifier = Modifier.height(16.dp))
                 Button(onClick = {
-                    val quiz = Quiz(name = quizName, creatorId = userId)
-                    viewModel.submitQuiz(quiz, questions) { success ->
-                        if (success) {
-                            navController?.navigate("my_quizzes")
-                        } else {
-                            // Handle failure
-                        }
-                    }
+                    navController?.navigate("my_quizzes")
                 }) {
                     Text("Submit Quiz")
                 }

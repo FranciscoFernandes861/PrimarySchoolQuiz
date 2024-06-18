@@ -70,7 +70,7 @@ fun TeacherLoginScreen(navController: NavController? = null) {
         auth.signInWithEmailAndPassword(email, password)
             .addOnCompleteListener { task ->
                 if (task.isSuccessful) {
-                    navController?.navigate("teacher_app")
+                    navController?.navigate("teacher_menu")
                 } else {
                     // Handle errors
                     try {
