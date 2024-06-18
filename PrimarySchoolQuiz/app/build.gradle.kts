@@ -83,14 +83,15 @@ dependencies {
     debugImplementation("androidx.compose.ui:ui-tooling")
     debugImplementation("androidx.compose.ui:ui-test-manifest")
 
+    // room
+
     val roomVersion = "2.6.1"
 
     implementation("androidx.room:room-runtime:$roomVersion")
     annotationProcessor("androidx.room:room-compiler:$roomVersion")
 
-    // To use Kotlin Symbol Processing (KSP)
+
     ksp("androidx.room:room-compiler:$roomVersion")
-    // Add the room-ktx dependency for coroutine support
     implementation("androidx.room:room-ktx:$roomVersion")
 
     // firestore
@@ -104,5 +105,9 @@ dependencies {
     // Declare the dependency for the Cloud Firestore library
     // When using the BoM, you don't specify versions in Firebase library dependencies
     implementation("com.google.firebase:firebase-firestore")
+
+    // fcm
+    implementation ("com.google.firebase:firebase-messaging:24.0.0")
+
 
 }

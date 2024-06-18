@@ -1,5 +1,6 @@
 package com.example.primaryschoolquiz.db
 
+import android.content.Context
 import android.graphics.Bitmap
 import android.graphics.Color
 import androidx.lifecycle.LiveData
@@ -9,12 +10,14 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.tasks.await
 import kotlinx.coroutines.withContext
 import java.io.ByteArrayOutputStream
+import createNotification
 
-class QuizRepository(private val quizDao: QuizDao) {
+class QuizRepository(private val quizDao: QuizDao, private val context: Context) {
 
     fun getAllQuizzes(userId: String): LiveData<List<QuizWithQuestions>> {
         return quizDao.getAllQuizzes(userId)
     }
+
     suspend fun insertQuiz(quiz: Quiz): Long {
         return quizDao.insertQuiz(quiz)
     }
@@ -59,6 +62,10 @@ class QuizRepository(private val quizDao: QuizDao) {
                     quizDao.insertQuestion(question.copy(quizId = quizWithQRCode.id))
                 }
                 println("Quiz and questions saved to Room database")
+
+
+                createNotification(context)
+
                 true
             } catch (e: Exception) {
                 e.printStackTrace()
@@ -67,8 +74,6 @@ class QuizRepository(private val quizDao: QuizDao) {
             }
         }
     }
-
-
 
     private fun generateQRCode(content: String): Bitmap {
         val writer = com.google.zxing.qrcode.QRCodeWriter()
@@ -83,5 +88,4 @@ class QuizRepository(private val quizDao: QuizDao) {
         }
         return bmp
     }
-
 }

@@ -1,12 +1,12 @@
 package com.example.primaryschoolquiz.db
 
 import android.app.Application
-import android.content.Context
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.viewModelScope
 import com.google.firebase.auth.FirebaseAuth
 import kotlinx.coroutines.launch
+
 class QuizViewModel(application: Application) : AndroidViewModel(application) {
 
     private val repository: QuizRepository
@@ -14,7 +14,7 @@ class QuizViewModel(application: Application) : AndroidViewModel(application) {
 
     init {
         val quizDao = QuizDatabase.getDatabase(application).quizDao()
-        repository = QuizRepository(quizDao)
+        repository = QuizRepository(quizDao, application)
         // Assume userId is passed as a parameter or retrieved from a user session
         val userId = getUserIdFromSession()
         quizzes = repository.getAllQuizzes(userId)
