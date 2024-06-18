@@ -92,4 +92,17 @@ dependencies {
     ksp("androidx.room:room-compiler:$roomVersion")
     // Add the room-ktx dependency for coroutine support
     implementation("androidx.room:room-ktx:$roomVersion")
+
+    // firestore
+    implementation ("com.google.zxing:core:3.4.1")
+    implementation ("com.google.firebase:firebase-firestore-ktx:25.0.0")
+    implementation ("com.google.firebase:firebase-storage-ktx:21.0.0")
+
+    implementation("io.coil-kt:coil-compose:2.0.0")
+    implementation(platform("com.google.firebase:firebase-bom:32.8.0"))
+
+    // Declare the dependency for the Cloud Firestore library
+    // When using the BoM, you don't specify versions in Firebase library dependencies
+    implementation("com.google.firebase:firebase-firestore")
+
 }

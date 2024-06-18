@@ -9,9 +9,10 @@ import androidx.room.Embedded
 
 @Entity(tableName = "quiz_table")
 data class Quiz(
-    @PrimaryKey(autoGenerate = true) val id: Int = 0,
+    @PrimaryKey val id: String = "",
     val name: String,
-    val creatorId: String
+    val creatorId: String,
+    val qrCodeUrl: String? = null  // Add this field
 )
 
 @Entity(
@@ -26,7 +27,7 @@ data class Quiz(
 )
 data class Question(
     @PrimaryKey(autoGenerate = true) val id: Int = 0,
-    val quizId: Int,
+    val quizId: String,
     val question: String,
     val option1: String,
     val option2: String,

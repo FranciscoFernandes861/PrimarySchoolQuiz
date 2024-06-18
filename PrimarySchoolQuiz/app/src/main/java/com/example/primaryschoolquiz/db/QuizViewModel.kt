@@ -1,6 +1,7 @@
 package com.example.primaryschoolquiz.db
 
 import android.app.Application
+import android.content.Context
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.viewModelScope
@@ -35,5 +36,18 @@ class QuizViewModel(application: Application) : AndroidViewModel(application) {
     private fun getUserIdFromSession(): String {
         // Logic to get the current user ID from the session or authentication system
         return FirebaseAuth.getInstance().currentUser?.uid ?: ""
+    }
+
+    fun showQuizCode(quizId: Int) {
+        // Logic to show quiz code, for example using a Toast
+        // val context = getApplication<Application>().applicationContext
+        // Toast.makeText(context, "Quiz Code: $quizId", Toast.LENGTH_SHORT).show()
+    }
+
+    fun submitQuiz(quiz: Quiz, questions: List<Question>, onComplete: (Boolean) -> Unit) {
+        viewModelScope.launch {
+            val result = repository.submitQuiz(quiz, questions)
+            onComplete(result)
+        }
     }
 }
