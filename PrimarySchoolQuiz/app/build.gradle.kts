@@ -136,8 +136,6 @@ dependencies {
     implementation ("com.google.accompanist:accompanist-navigation-material:0.28.0")
     implementation ("com.google.accompanist:accompanist-insets:0.28.0")
     implementation ("com.google.maps.android:maps-compose:2.5.3")
-    implementation ("com.google.android.gms:play-services-maps:18.2.0")
-    implementation ("com.google.android.gms:play-services-location:21.3.0")
 
     implementation ("androidx.lifecycle:lifecycle-livedata-ktx:2.8.2")
 

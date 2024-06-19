@@ -32,7 +32,7 @@
             android:value="@string/default_notification_channel_id" />
         <meta-data
             android:name="com.google.android.geo.API_KEY"
-            android:value="k0tmarNIzQ0WflrPJY6Xp4kPJRc="/>
+            android:value="x53XKAj3ifrjdE6cgPCYRVQAHjI="/>
 
         <activity
             android:name=".view.activity.MainActivity"
