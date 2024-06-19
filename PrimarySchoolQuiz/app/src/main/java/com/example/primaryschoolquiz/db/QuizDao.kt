@@ -2,6 +2,7 @@ package com.example.primaryschoolquiz.db
 
 import androidx.lifecycle.LiveData
 import androidx.room.*
+import kotlinx.coroutines.flow.Flow
 
 @Dao
 interface QuizDao {
@@ -15,5 +16,7 @@ interface QuizDao {
     @Query("SELECT * FROM quiz_table WHERE creatorId = :creatorId")
     fun getAllQuizzes(creatorId: String): LiveData<List<QuizWithQuestions>>
 
-
+    @Transaction
+    @Query("SELECT * FROM quiz_table WHERE id = :quizId")
+    fun getQuizWithQuestions(quizId: String): Flow<QuizWithQuestions?>
 }

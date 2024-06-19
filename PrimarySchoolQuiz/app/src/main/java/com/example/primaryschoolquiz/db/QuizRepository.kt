@@ -11,11 +11,20 @@ import kotlinx.coroutines.tasks.await
 import kotlinx.coroutines.withContext
 import java.io.ByteArrayOutputStream
 import createNotification
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.onEach
 
 class QuizRepository(private val quizDao: QuizDao, private val context: Context) {
 
     fun getAllQuizzes(userId: String): LiveData<List<QuizWithQuestions>> {
         return quizDao.getAllQuizzes(userId)
+    }
+
+    fun getQuizWithQuestions(quizId: String): Flow<QuizWithQuestions?> {
+        println("Repository fetching quiz with ID: $quizId")
+        return quizDao.getQuizWithQuestions(quizId).onEach {
+            println("Fetched quiz from DAO: $it")
+        }
     }
 
     suspend fun insertQuiz(quiz: Quiz): Long {
@@ -43,37 +52,33 @@ class QuizRepository(private val quizDao: QuizDao, private val context: Context)
                 val uploadTask = storageRef.putBytes(data).await()
                 val downloadUrl = uploadTask.storage.downloadUrl.await()
 
-                // Logging to verify upload
-                println("Uploaded QR code to: ${storageRef.path}")
-                println("Download URL: ${downloadUrl}")
-
-                // Create a copy of the quiz object with the QR code URL
+                // Create a copy of the quiz object with the QR code URL and the generated ID
                 val quizWithQRCode = quiz.copy(id = quizId, qrCodeUrl = downloadUrl.toString())
 
                 // Save the quiz to Firestore
                 db.collection("quizzes").document(quizId).set(quizWithQRCode).await()
 
-                // Logging to verify Firestore save
-                println("Quiz saved to Firestore with ID: $quizId")
-
                 // Insert the quiz and questions into Room database
+                println("Inserting quiz into Room database: $quizWithQRCode")
                 quizDao.insertQuiz(quizWithQRCode)
                 questions.forEach { question ->
-                    quizDao.insertQuestion(question.copy(quizId = quizWithQRCode.id))
+                    val questionWithQuizId = question.copy(quizId = quizWithQRCode.id)
+                    println("Inserting question into Room database: $questionWithQuizId")
+                    quizDao.insertQuestion(questionWithQuizId)
                 }
-                println("Quiz and questions saved to Room database")
-
 
                 createNotification(context)
 
                 true
             } catch (e: Exception) {
                 e.printStackTrace()
-                println("Exception during quiz submission: ${e.message}")
                 false
             }
         }
     }
+
+
+
 
     private fun generateQRCode(content: String): Bitmap {
         val writer = com.google.zxing.qrcode.QRCodeWriter()

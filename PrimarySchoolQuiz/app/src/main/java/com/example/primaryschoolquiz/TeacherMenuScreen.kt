@@ -11,20 +11,23 @@ import androidx.compose.material.icons.filled.ExitToApp
 import androidx.compose.material.icons.filled.List
 import androidx.compose.material.icons.filled.Person
 import androidx.compose.material3.*
-import androidx.compose.runtime.Composable
+import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
-import com.google.firebase.auth.FirebaseAuth
 import com.example.primaryschoolquiz.ui.CustomTopAppBar
+import com.google.firebase.auth.FirebaseAuth
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun TeacherMenuScreen(navController: NavController, onLogout: () -> Unit) {
+    var showLogoutDialog by remember { mutableStateOf(false) }
+
     Scaffold(
         topBar = {
             CustomTopAppBar(
@@ -77,10 +80,37 @@ fun TeacherMenuScreen(navController: NavController, onLogout: () -> Unit) {
                 DrawerItem(
                     icon = Icons.Default.ExitToApp,
                     label = "Logout",
-                    onClick = { onLogout() }
+                    onClick = { showLogoutDialog = true }
                 )
             }
         }
+    }
+
+    if (showLogoutDialog) {
+        AlertDialog(
+            onDismissRequest = { showLogoutDialog = false },
+            title = { Text("Confirm Logout") },
+            text = { Text("Are you sure you want to log out?") },
+            confirmButton = {
+                Button(
+                    onClick = {
+                        showLogoutDialog = false
+                        onLogout()
+                    },
+                    colors = ButtonDefaults.buttonColors(containerColor = Color(0xFFF7CD23))
+                ) {
+                    Text("Yes", color = Color.White, fontWeight = FontWeight.Bold)
+                }
+            },
+            dismissButton = {
+                Button(
+                    onClick = { showLogoutDialog = false },
+                    colors = ButtonDefaults.buttonColors(containerColor = Color(0xFFF7CD23))
+                ) {
+                    Text("No", color = Color.White, fontWeight = FontWeight.Bold)
+                }
+            }
+        )
     }
 }
 

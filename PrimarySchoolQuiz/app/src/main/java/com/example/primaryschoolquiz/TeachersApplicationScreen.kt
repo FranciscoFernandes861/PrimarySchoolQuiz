@@ -18,13 +18,11 @@ import androidx.navigation.NavController
 import com.example.primaryschoolquiz.ui.CustomTopAppBar
 import com.google.firebase.auth.FirebaseAuth
 import kotlinx.coroutines.launch
-
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun TeacherApplicationScreen(navController: NavController? = null) {
     val user = FirebaseAuth.getInstance().currentUser
     val email = user?.email ?: "No Email"
-    val scope = rememberCoroutineScope()
 
     Scaffold(
         topBar = {
@@ -45,14 +43,22 @@ fun TeacherApplicationScreen(navController: NavController? = null) {
             }
         }
     ) { innerPadding ->
-        Box(
+        Column(
             modifier = Modifier
                 .fillMaxSize()
                 .padding(innerPadding)
                 .background(Color.White),
-            contentAlignment = Alignment.Center
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.Center
         ) {
             Text(text = "Welcome to the Teacher Application", fontSize = 18.sp)
+            Spacer(modifier = Modifier.height(16.dp))
+            Button(onClick = {
+                navController?.navigate("map_screen")
+            }) {
+                Text("Show Map")
+            }
         }
     }
 }
+

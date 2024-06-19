@@ -1,6 +1,5 @@
 package com.example.primaryschoolquiz
 
-import android.media.Image
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -17,12 +16,14 @@ import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.semantics.Role.Companion.Image
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
-import coil.compose.rememberImagePainter
+import coil.compose.rememberAsyncImagePainter
+import com.example.primaryschoolquiz.db.Question
 import com.example.primaryschoolquiz.db.QuizViewModel
 import com.example.primaryschoolquiz.db.QuizWithQuestions
 import com.example.primaryschoolquiz.ui.CustomTopAppBar
@@ -49,11 +50,13 @@ fun MyQuizzesScreen(viewModel: QuizViewModel = viewModel(), navController: NavCo
                 },
                 navController = navController!!
             )
-        }
+        },
+        containerColor = Color.White
     ) { innerPadding ->
         Column(
             modifier = Modifier
                 .fillMaxSize()
+                .background(Color.White)
                 .padding(innerPadding)
         ) {
             if (selectedQuiz == null) {
@@ -78,7 +81,7 @@ fun MyQuizzesScreen(viewModel: QuizViewModel = viewModel(), navController: NavCo
                     title = { Text("Quiz Code") },
                     text = {
                         Image(
-                            painter = rememberImagePainter(qrCodeUrl),
+                            painter = rememberAsyncImagePainter(qrCodeUrl),
                             contentDescription = "QR Code"
                         )
                     },
@@ -93,7 +96,6 @@ fun MyQuizzesScreen(viewModel: QuizViewModel = viewModel(), navController: NavCo
     }
 }
 
-
 @Composable
 fun QuizItem(
     quizWithQuestions: QuizWithQuestions,
@@ -104,41 +106,116 @@ fun QuizItem(
         modifier = Modifier
             .padding(8.dp)
             .fillMaxWidth()
-            .border(1.dp, Color.Gray)
+            .border(2.dp, Color.Gray, shape = RoundedCornerShape(8.dp))
             .background(Color.White)
             .clickable(onClick = onQuizClick)
             .padding(16.dp),
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.SpaceBetween
     ) {
-        Text(quizWithQuestions.quiz.name, style = MaterialTheme.typography.headlineSmall)
+        Text(
+            text = quizWithQuestions.quiz.name,
+            style = MaterialTheme.typography.headlineSmall.copy(
+                color = Color(0xFF2A3A60),
+                fontWeight = FontWeight.Bold
+            )
+        )
         Button(
             onClick = onCodeClick,
             colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF2A3A60))
         ) {
-            Text("Quiz Code")
+            Text("Quiz Code", color = Color.White, fontWeight = FontWeight.Bold)
         }
     }
 }
 
 @Composable
 fun QuizDetailScreen(quizWithQuestions: QuizWithQuestions, onBack: () -> Unit) {
+    var currentIndex by remember { mutableStateOf(0) }
+
     Column(
         modifier = Modifier
+            .fillMaxSize()
             .padding(16.dp)
-            .fillMaxWidth()
+            .background(Color.White)
     ) {
-        TextButton(onClick = onBack) {
-            Text("Back")
-        }
-        Text(quizWithQuestions.quiz.name, style = MaterialTheme.typography.headlineSmall)
-        quizWithQuestions.questions.forEach { question ->
-            Text(question.question, style = MaterialTheme.typography.bodyMedium)
-            Text("1. ${question.option1}")
-            Text("2. ${question.option2}")
-            Text("3. ${question.option3}")
-            Text("4. ${question.option4}")
+        Spacer(modifier = Modifier.height(16.dp))
+
+        val question = quizWithQuestions.questions[currentIndex]
+        Text(
+            text = question.question,
+            style = MaterialTheme.typography.bodyLarge.copy(
+                color = Color(0xFF2A3A60),
+                fontWeight = FontWeight.Bold,
+                fontSize = 24.sp // Increased the size of the question text
+            ),
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(16.dp),
+            textAlign = TextAlign.Center
+        )
+
+        Spacer(modifier = Modifier.height(16.dp))
+
+        Column(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(horizontal = 16.dp),
+            verticalArrangement = Arrangement.Center,
+            horizontalAlignment = Alignment.CenterHorizontally
+        ) {
+            OptionItem(text = question.option1)
             Spacer(modifier = Modifier.height(8.dp))
+            OptionItem(text = question.option2)
+            Spacer(modifier = Modifier.height(8.dp))
+            OptionItem(text = question.option3)
+            Spacer(modifier = Modifier.height(8.dp))
+            OptionItem(text = question.option4)
         }
+
+        Spacer(modifier = Modifier.weight(1f))
+
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(bottom = 16.dp),
+            horizontalArrangement = Arrangement.SpaceBetween,
+            verticalAlignment = Alignment.Bottom
+        ) {
+            if (currentIndex > 0) {
+                Button(
+                    onClick = { currentIndex-- },
+                    colors = ButtonDefaults.buttonColors(containerColor = Color(0xFFF7CD23)),
+                    modifier = Modifier.size(160.dp, 48.dp)
+                ) {
+                    Text("PREVIOUS", color = Color.White, fontWeight = FontWeight.Bold, textAlign = TextAlign.Center)
+                }
+            } else {
+                Spacer(modifier = Modifier.size(160.dp, 48.dp))
+            }
+            if (currentIndex < quizWithQuestions.questions.size - 1) {
+                Button(
+                    onClick = { currentIndex++ },
+                    colors = ButtonDefaults.buttonColors(containerColor = Color(0xFFF7CD23)),
+                    modifier = Modifier.size(160.dp, 48.dp)
+                ) {
+                    Text("NEXT", color = Color.White, fontWeight = FontWeight.Bold, textAlign = TextAlign.Center)
+                }
+            } else {
+                Spacer(modifier = Modifier.size(160.dp, 48.dp))
+            }
+        }
+    }
+}
+
+@Composable
+fun OptionItem(text: String) {
+    Box(
+        modifier = Modifier
+            .fillMaxWidth()
+            .background(Color(0xFF2A3A60), shape = RoundedCornerShape(8.dp))
+            .padding(16.dp)
+    ) {
+        Text(text, color = Color.White, style = MaterialTheme.typography.bodyMedium)
     }
 }

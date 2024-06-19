@@ -3,10 +3,10 @@ package com.example.primaryschoolquiz.db
 import android.app.Application
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
+import androidx.lifecycle.asLiveData
 import androidx.lifecycle.viewModelScope
 import com.google.firebase.auth.FirebaseAuth
 import kotlinx.coroutines.launch
-
 class QuizViewModel(application: Application) : AndroidViewModel(application) {
 
     private val repository: QuizRepository
@@ -15,7 +15,6 @@ class QuizViewModel(application: Application) : AndroidViewModel(application) {
     init {
         val quizDao = QuizDatabase.getDatabase(application).quizDao()
         repository = QuizRepository(quizDao, application)
-        // Assume userId is passed as a parameter or retrieved from a user session
         val userId = getUserIdFromSession()
         quizzes = repository.getAllQuizzes(userId)
     }
@@ -34,14 +33,10 @@ class QuizViewModel(application: Application) : AndroidViewModel(application) {
     }
 
     private fun getUserIdFromSession(): String {
-        // Logic to get the current user ID from the session or authentication system
         return FirebaseAuth.getInstance().currentUser?.uid ?: ""
     }
 
     fun showQuizCode(quizId: Int) {
-        // Logic to show quiz code, for example using a Toast
-        // val context = getApplication<Application>().applicationContext
-        // Toast.makeText(context, "Quiz Code: $quizId", Toast.LENGTH_SHORT).show()
     }
 
     fun submitQuiz(quiz: Quiz, questions: List<Question>, onComplete: (Boolean) -> Unit) {
@@ -49,5 +44,10 @@ class QuizViewModel(application: Application) : AndroidViewModel(application) {
             val result = repository.submitQuiz(quiz, questions)
             onComplete(result)
         }
+    }
+
+    fun getQuizWithQuestions(quizId: String): LiveData<QuizWithQuestions?> {
+        println("Fetching quiz with ID: $quizId")
+        return repository.getQuizWithQuestions(quizId).asLiveData()
     }
 }

@@ -7,7 +7,7 @@ import androidx.room.RoomDatabase
 import androidx.room.migration.Migration
 import androidx.sqlite.db.SupportSQLiteDatabase
 
-@Database(entities = [Quiz::class, Question::class], version = 3, exportSchema = false)
+@Database(entities = [Quiz::class, Question::class], version = 4, exportSchema = false)
 abstract class QuizDatabase : RoomDatabase() {
 
     abstract fun quizDao(): QuizDao
@@ -18,11 +18,11 @@ abstract class QuizDatabase : RoomDatabase() {
 
         val MIGRATION_1_2 = object : Migration(1, 2) {
             override fun migrate(database: SupportSQLiteDatabase) {
-                // Create the new table for questions
+                // Create the new table for questions with String quizId
                 database.execSQL("""
                     CREATE TABLE `question_table` (
                         `id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
-                        `quizId` INTEGER NOT NULL,
+                        `quizId` TEXT NOT NULL,
                         `question` TEXT NOT NULL,
                         `option1` TEXT NOT NULL,
                         `option2` TEXT NOT NULL,
@@ -33,14 +33,16 @@ abstract class QuizDatabase : RoomDatabase() {
                     )
                 """)
 
-                // Ensure the quiz_table has the correct schema (if changed)
+                // Ensure the quiz_table has the correct schema with String id
                 database.execSQL("""
                     CREATE TABLE IF NOT EXISTS `quiz_table_new` (
-                        `id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
-                        `name` TEXT NOT NULL
+                        `id` TEXT PRIMARY KEY NOT NULL,
+                        `name` TEXT NOT NULL,
+                        `creatorId` TEXT NOT NULL,
+                        `qrCodeUrl` TEXT
                     )
                 """)
-                database.execSQL("INSERT INTO `quiz_table_new` (`id`, `name`) SELECT `id`, `name` FROM `quiz_table`")
+                database.execSQL("INSERT INTO `quiz_table_new` (`id`, `name`, `creatorId`) SELECT `id`, `name`, '' FROM `quiz_table`")
                 database.execSQL("DROP TABLE `quiz_table`")
                 database.execSQL("ALTER TABLE `quiz_table_new` RENAME TO `quiz_table`")
             }
@@ -48,17 +50,10 @@ abstract class QuizDatabase : RoomDatabase() {
 
         val MIGRATION_2_3 = object : Migration(2, 3) {
             override fun migrate(database: SupportSQLiteDatabase) {
-                // Add userId column to quiz_table
+                // Add qrCodeUrl column to quiz_table
                 database.execSQL("""
-                    CREATE TABLE IF NOT EXISTS `quiz_table_new` (
-                        `id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
-                        `name` TEXT NOT NULL,
-                        `userId` TEXT NOT NULL
-                    )
+                    ALTER TABLE `quiz_table` ADD COLUMN `qrCodeUrl` TEXT
                 """)
-                database.execSQL("INSERT INTO `quiz_table_new` (`id`, `name`, `userId`) SELECT `id`, `name`, '' FROM `quiz_table`")
-                database.execSQL("DROP TABLE `quiz_table`")
-                database.execSQL("ALTER TABLE `quiz_table_new` RENAME TO `quiz_table`")
             }
         }
 
